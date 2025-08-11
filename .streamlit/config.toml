@@ -8,3 +8,15 @@ font="sans serif"
 
 [client]
 toolbarMode = "auto"
+showErrorDetails = false
+
+[server]
+# Enhanced for mobile performance
+enableWebsocketCompression = true
+enableXsrfProtection = false
+maxUploadSize = 200
+maxMessageSize = 200
+
+[browser]
+# Mobile-friendly settings
+gatherUsageStats = false

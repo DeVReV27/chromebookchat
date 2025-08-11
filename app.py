@@ -8,7 +8,6 @@ from pathlib import Path
 
 from src.chat_utils import render_markdown, format_usage, tool_registry, run_slash_tool
 from src.presets import SYSTEM_PRESETS, ROLE_PROFILES
-from src.components.chat_header import chat_header
 
 # ----------------------------
 # Config / client
@@ -21,8 +20,12 @@ except:
 OPENAI_API_KEY = OPENAI_API_KEY or os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
+# Avatar paths
+USER_AVATAR = "assets/user.png"
+BOT_AVATAR = "assets/bot.png"
+
 st.set_page_config(
-    page_title="Chromebook Chat",
+    page_title="GPT-5 Chat",
     page_icon="💬",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -70,7 +73,7 @@ with st.sidebar:
         #st.markdown("---")  # Add a separator line
     
     st.markdown("### ⚙️ Settings")
-    model = st.selectbox("Model", ["gpt-5-2025-08-07", "gpt-5-mini-2025-08-07"], index=0)
+    model = st.selectbox("Model", ["gpt-5", "gpt-5-mini"], index=0)
     temperature = st.slider("Temperature", 0.0, 1.0, 0.5, 0.05)
     max_output_tokens = st.slider("Max output tokens", 256, 8192, 2048, 128)
     verbosity = st.selectbox("Verbosity", ["low", "medium", "high"], index=1)
@@ -189,7 +192,8 @@ st.markdown(
 
 # Render history
 for msg in chat["messages"]:
-    with st.chat_message(msg["role"], avatar="assistant" if msg["role"] == "assistant" else "user"):
+    avatar = BOT_AVATAR if msg["role"] == "assistant" else USER_AVATAR
+    with st.chat_message(msg["role"], avatar=avatar):
         render_markdown(msg["content"])
 
 # ----------------------------
@@ -240,11 +244,11 @@ def exec_tool(name: str, args: Dict[str, Any]) -> str:
 # ----------------------------
 # Chat input / send
 # ----------------------------
-user_text = st.chat_input("Enter your message here")
+user_text = st.chat_input("Type your message here…")
 if user_text:
     # Push user message
     chat["messages"].append({"role": "user", "content": user_text})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar=USER_AVATAR):
         render_markdown(user_text)
 
     # Slash-tool fallback (fast path)
@@ -261,7 +265,7 @@ if user_text:
         base_messages.append({"role": "system", "content": role_text})
     base_messages += chat["messages"]
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar=BOT_AVATAR):
         placeholder = st.empty()
         stream_text = ""
         usage_snapshot = None
@@ -276,8 +280,10 @@ if user_text:
                 tools = openai_tools() if tools_enabled else None
                 
                 # First try with tools if enabled
+                # Map gpt-5 models to actual OpenAI models
+                actual_model = model.replace("gpt-5-mini", "gpt-4o-mini").replace("gpt-5", "gpt-4o")
                 completion = client.chat.completions.create(
-                    model=model,  # Use the actual selected GPT-5 model
+                    model=actual_model,
                     messages=base_messages,
                     temperature=temperature,
                     max_tokens=max_output_tokens,
@@ -304,7 +310,7 @@ if user_text:
                     
                     # Second call with tool results
                     second_completion = client.chat.completions.create(
-                        model=model,  # Use the actual selected GPT-5 model
+                        model=actual_model,
                         messages=base_messages + [message] + tool_messages,
                         temperature=temperature,
                         max_tokens=max_output_tokens,
