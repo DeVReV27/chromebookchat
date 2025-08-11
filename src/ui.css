@@ -73,14 +73,34 @@ html, body, .stApp {
   }
 }
 
+/* Mobile header optimizations - much more compact */
+@media (max-width: 768px) {
+  .hero-content { 
+    padding: 1rem 1rem !important; 
+  }
+  .hero-title { 
+    font-size: 1.5rem !important; 
+    line-height: 1.1 !important;
+    margin-bottom: 0.25rem !important;
+  }
+  .hero-sub { 
+    font-size: 13px !important; 
+    margin-top: 2px !important;
+  }
+}
+
 /* Small mobile devices */
 @media (max-width: 640px) {
   .hero-title { 
-    font-size: 2rem !important; 
-    line-height: 1.2 !important;
+    font-size: 1.3rem !important; 
+    line-height: 1.1 !important;
   }
   .hero-content { 
-    padding: 2rem 1rem !important; 
+    padding: 0.75rem 1rem !important; 
+  }
+  .hero-sub { 
+    font-size: 12px !important; 
+    margin-top: 1px !important;
   }
   
   .block-container {
@@ -97,10 +117,15 @@ html, body, .stApp {
 /* Extra small devices */
 @media (max-width: 480px) {
   .hero-title { 
-    font-size: 1.75rem !important; 
+    font-size: 1.1rem !important; 
+    line-height: 1.0 !important;
   }
   .hero-content { 
-    padding: 1.5rem 0.5rem !important; 
+    padding: 0.5rem 0.5rem !important; 
+  }
+  .hero-sub { 
+    font-size: 11px !important; 
+    margin-top: 0px !important;
   }
   
   .block-container {
