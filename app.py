@@ -22,7 +22,7 @@ OPENAI_API_KEY = OPENAI_API_KEY or os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 st.set_page_config(
-    page_title="GPT-5 Chat",
+    page_title="Chromebook Chat",
     page_icon="💬",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -70,7 +70,7 @@ with st.sidebar:
         #st.markdown("---")  # Add a separator line
     
     st.markdown("### ⚙️ Settings")
-    model = st.selectbox("Model", ["gpt-5", "gpt-5-mini"], index=0)
+    model = st.selectbox("Model", ["gpt-5-2025-08-07", "gpt-5-mini-2025-08-07"], index=0)
     temperature = st.slider("Temperature", 0.0, 1.0, 0.5, 0.05)
     max_output_tokens = st.slider("Max output tokens", 256, 8192, 2048, 128)
     verbosity = st.selectbox("Verbosity", ["low", "medium", "high"], index=1)
@@ -240,7 +240,7 @@ def exec_tool(name: str, args: Dict[str, Any]) -> str:
 # ----------------------------
 # Chat input / send
 # ----------------------------
-user_text = st.chat_input("Message GPT-5… (try /calc 2*(3+4))")
+user_text = st.chat_input("Enter your message here")
 if user_text:
     # Push user message
     chat["messages"].append({"role": "user", "content": user_text})
@@ -277,7 +277,7 @@ if user_text:
                 
                 # First try with tools if enabled
                 completion = client.chat.completions.create(
-                    model=model.replace("gpt-5", "gpt-4"),  # Use available model
+                    model=model,  # Use the actual selected GPT-5 model
                     messages=base_messages,
                     temperature=temperature,
                     max_tokens=max_output_tokens,
@@ -304,7 +304,7 @@ if user_text:
                     
                     # Second call with tool results
                     second_completion = client.chat.completions.create(
-                        model=model.replace("gpt-5", "gpt-4"),
+                        model=model,  # Use the actual selected GPT-5 model
                         messages=base_messages + [message] + tool_messages,
                         temperature=temperature,
                         max_tokens=max_output_tokens,
